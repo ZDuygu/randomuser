@@ -57,9 +57,9 @@ fwrite($run_log,"Security Grup Ekleniyor..."."\n" );
     $cleaner = [];
     $cleaner["cn"] ="11223344";
     $cleaner["sAMAccountName"] = "11223344";
-    $cleaner["objectClass"] = ["top","group","posixGroup"];
+    $cleaner["objectClass"] = ["top","group"];
     $cleaner["groupType"] = "-2147483646";
-    $dn = "cn=11223344"  . DOMAIN_DN_DC ;
+    $dn = "cn=11223344,"  . DOMAIN_DN_DC ;
     $flag = @$samba->addObject($samba->escape($dn), $cleaner);
     if ($flag === true) {
     echo("Security Grup Başarıyla Eklendi...\n");
@@ -68,7 +68,6 @@ fwrite($run_log,"Security Grup Ekleniyor..."."\n" );
     echo("Security Grup EKLENEMEDİ!!!!!...".$flag."\n");
     fwrite($run_log,"Security Grup EKLENEMEDİ!!!!!...".$flag."\n" ); 
     }
-
     echo("Dist Grup Ekleniyor...\n");
     fwrite($run_log,"Dist Grup Ekleniyor..."."\n" ); 
 
@@ -76,9 +75,9 @@ fwrite($run_log,"Security Grup Ekleniyor..."."\n" );
     $cleaner = [];
     $cleaner["cn"] ="11223355";
     $cleaner["sAMAccountName"] = "11223355";
-    $cleaner["objectClass"] = ["top","group","posixGroup"];
+    $cleaner["objectClass"] = ["top","group"];
     $cleaner["groupType"] = "2";
-    $dn = "cn=11223355"  . DOMAIN_DN_DC ;
+    $dn = "cn=11223355,"  . DOMAIN_DN_DC ;
     $flag = @$samba->addObject($samba->escape($dn), $cleaner);
     if ($flag === true) {
     echo("Dist Grup Başarıyla Eklendi...\n");
@@ -105,9 +104,9 @@ for ($x = 10000000200; $x <= 10000000300; $x++) {
     $cleaner["cn"] = $x;
     $cleaner["sAMAccountName"] = $x;
     $dn = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
-    if($samba->check($dn) == true){
-        continue;
-    }
+    // if($samba->check($dn) == true){
+    //     continue;
+    // }
     $cleaner["objectClass"] = ["top","person","user","organizationalPerson","posixAccount","shadowAccount"];
     $cleaner["unicodepwd"] = mb_convert_encoding("\"" ."Passw0rd" . "\"", "UTF-16LE");
     
@@ -136,12 +135,12 @@ for ($x = 10000000200; $x <= 10000000300; $x++) {
     $cleaner2["name"] = $x;
     $cleaner2["cn"] = $x;
     $cleaner2["sAMAccountName"] = "g-" . $x;
-    $cleaner2["objectClass"] = ["top","group","posixGroup"];
-    $cleaner2["gidNumber"] = 2000 + $counter;
+    $cleaner2["objectClass"] = ["top","group"];
     $dn2 = "cn=" . $x . ",ou=Groups," . DOMAIN_DN_DC ;
 
    $flag2 = @$samba->addObject($samba->escape($dn2), $cleaner2);
-
+   echo $dn2;
+   print_r($cleaner2);
   
    if ($flag2 === true) {
         fwrite($eklenen_grup, "BAŞARILI----->" . $dn2 ."\n" ); 
@@ -160,11 +159,10 @@ fwrite($run_log,"Kullanıcı Grupları Eklendi..."."\n" );
 
 /* USERS ADD END */
 for ($x = 10000000200; $x <= 10000000300; $x++) {
-    
     $cleaner = [];
-    $cleaner["memberOf"] = "CN=".$x .",OU=Groups, DC=domain,DC=lab";
-    $dn = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
-    $flag = @$samba->addAttribute($samba->escape($dn), $cleaner);
+    $dn = "CN=".$x .",OU=Groups,". DOMAIN_DN_DC;
+    $member = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
+    $flag = @$samba->addAttribute($dn, ["member" => [$member]]);
 
     if ($flag === true) {
         fwrite($kendi_grubuna_eklenen, "BAŞARILI----->" . $dn ."\n" ); 
@@ -175,10 +173,9 @@ for ($x = 10000000200; $x <= 10000000300; $x++) {
     }
 
     $cleaner = [];
-    $cleaner["memberOf"] = "CN=11223344" .",OU=Groups, DC=domain,DC=lab";
-    $dn = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
-    $flag = @$samba->addAttribute($samba->escape($dn), $cleaner);
-
+    $dn = "CN=11223344,". DOMAIN_DN_DC;
+    $member = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
+    $flag = @$samba->addAttribute($dn, ["member" => [$member]]);
     if ($flag === true) {
         fwrite($security_gruba_eklenen, "BAŞARILI----->" . $dn ."\n" ); 
         $sayilar[6]+=1;
@@ -187,9 +184,9 @@ for ($x = 10000000200; $x <= 10000000300; $x++) {
         $sayilar[7]+=1;
     }
     $cleaner = [];
-    $cleaner["memberOf"] = "CN=11223355" .",OU=Groups, DC=domain,DC=lab";
-    $dn = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
-    $flag = @$samba->addAttribute($samba->escape($dn), $cleaner);
+    $dn = "CN=11223355," . DOMAIN_DN_DC;
+    $menber = "cn=" . $x . ",cn=Users," .  DOMAIN_DN_DC;
+    $flag = @$samba->addAttribute($dn, ["member" => [$member]]);
 
     if ($flag === true) {
         fwrite($dist_gruba_eklenen, "BAŞARILI----->" . $dn ."\n" ); 
